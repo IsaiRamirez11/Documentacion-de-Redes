@@ -1,0 +1,78 @@
+ena
+conf term
+vlan 2
+name TICS
+exit
+vlan 3
+name NEGOCIOS
+exit
+interface range fa0/2-9
+switchport mode access
+switchport access vlan 2
+exit
+interface range fa0/10-23
+switchport mode access
+switchport access vlan 3
+exit
+interface range gig0/1-2
+switchport mode trunk
+exit
+vlan 4
+name Mecatronica
+exit
+vlan 5
+name Contabilidad
+
+
+
+ena 
+conf term
+vlan 4
+name Mecatronica
+exit
+interface range fa0/2-9
+switchport mode access
+switchport access vlan 4
+exit 
+
+vlan 2
+name TICS
+exit
+vlan 3
+name NEGOCIOS
+exit
+vlan 5 
+name Contabilidad
+
+
+
+
+ena
+conf term
+vlan 4
+name Mecatronica
+exit
+vlan 6
+name Gastro
+exit
+interface range fa0/2-9
+switchport mode access
+switchport access vlan 4
+exit
+interface range fa0/10-23
+switchport mode access
+switchport access vlan 5
+exit
+interface  gig0/1
+switchport mode trunk
+exit
+
+
+vlan 6
+name Gastro
+exit
+interface range fa0/10-23
+switchport mode access
+switchport access vlan 6
+exit
+

@@ -1,0 +1,133 @@
+EtherChannel 
+
+
+/////////////////////////// Switch de abajo  //////////////////////////
+
+ena 
+conf term
+VLAN 2
+name vlan2
+exit
+
+VLAN 3
+name vlan3
+exit 
+
+inter range fa0/2-9
+switchport Mode acces
+switchport acces vlan 2
+exit
+
+
+inter range fa0/11-20
+switchport Mode acces
+switchport acces vlan 3
+exit
+
+inter range Fa0/11-20
+switchport mode trunk
+ 
+
+
+////////////////////////////  Switch de en medio //////////////////////////////////
+
+
+ena
+conf term
+
+vlan 2
+name vlan2
+exit
+vlan 3
+name vlan3
+exit 
+
+interface range Fa0/2-9
+switchport mode Access
+switchport Access vlan 2 
+exit 
+
+interface range Fa0/23-24
+switchport mode Trunk 
+exit 
+
+interface range Gig0/1-2
+Channel-group 1 mode Active
+
+exit 
+interface Port-channel 1
+switchport mode Trunk 
+exit
+
+
+ 
+/////////////////////////////   switch principal  ////////////////////////////////////////
+
+
+
+
+ena
+conf term
+
+vlan 2
+name vlan2
+exit
+vlan 3
+name vlan3
+exit
+vlan 4
+name vlan4
+exit
+
+interface range Fa0/2-9
+switchport mode Access
+switchport Access vlan 4
+exit
+inter range Gig0/1-2
+channel-group 1 Mode Active
+exit
+interface Port-channel 1
+switchport mode Trunk 
+exit
+
+interface Fa0/24
+switchport mode Trunk 
+exit 
+
+
+
+//////////////////// Router ////////////////////////
+
+
+ena
+conf term
+interface Gig0/0
+no shut
+exit
+
+interface Gig0/0.2
+Description SVI-2
+Encapsulation Dot1Q 2
+ip add XXX.XXX.XXX.254 255.255.255.0
+no shut
+exit
+
+interface Gig0/0.3
+Description SVI-3
+Encapsulation Dot1Q 3
+ip add XXX.XXX.XXX.254 255.255.255.0
+no shut
+exit
+
+interface Gig0/0.4
+Description SVI-4
+Encapsulation Dot1Q 4
+ip add XXX.XXX.XXX.254 255.255.255.0
+no shut
+exit
+
+
+
+
+
+

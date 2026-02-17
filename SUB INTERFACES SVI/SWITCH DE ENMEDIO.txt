@@ -1,0 +1,40 @@
+SWITCH DE ENMEDIO
+
+///En el switch de en medio que esta conectado al router es necesario crear todas las vlan además si tiene alguna pertenencia de puertos ///definirla además de hacer troncal la conexión que va hacia el router asi como las conexiones que van hacia el resto de switches 
+
+
+ena
+conf term
+
+vlan 2
+Name TICS
+exit
+vlan 3
+Name NEGOCIOS
+exit
+vlan 4 
+Name MECATRONICA
+exit
+vlan 5
+Name CONTABILIDAD
+exit
+vlan 6
+name GASTRO
+exit
+
+
+interface range Fa0/2-9
+Switchport mode Access
+Switchport Access vlan 4
+exit
+
+interface range gig0/1-2
+switchport mode trunk
+
+exit
+
+interface Fa0/24
+switchport mode trunk
+exit
+
+

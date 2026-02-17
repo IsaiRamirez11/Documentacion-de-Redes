@@ -1,0 +1,52 @@
+enable
+conf t
+hostname RT-01
+
+! Interfaz física hacia el switch
+interface gig0/0
+ description TRUNK-A-SWITCH
+ no shutdown
+ exit
+
+! ===== SVI VLAN 2 =====
+interface gig0/0.2
+ description SVI-VLAN-2
+ encapsulation dot1Q 2
+ ip address 192.168.2.254 255.255.255.0
+ no shutdown
+ exit
+
+! ===== SVI VLAN 3 =====
+interface gig0/0.3
+ description SVI-VLAN-3
+ encapsulation dot1Q 3
+ ip address 192.168.3.254 255.255.255.0
+ no shutdown
+ exit
+
+! ===== SVI VLAN 4 =====
+interface gig0/0.4
+ description SVI-VLAN-4
+ encapsulation dot1Q 4
+ ip address 192.168.4.254 255.255.255.0
+ no shutdown
+ exit
+
+! ===== SVI VLAN 5 =====
+interface gig0/0.5
+ description SVI-VLAN-5
+ encapsulation dot1Q 5
+ ip address 192.168.5.254 255.255.255.0
+ no shutdown
+ exit
+
+! ===== SVI VLAN 6 =====
+interface gig0/0.6
+ description SVI-VLAN-6
+ encapsulation dot1Q 6
+ ip address 192.168.6.254 255.255.255.0
+ no shutdown
+ exit
+
+end
+wr

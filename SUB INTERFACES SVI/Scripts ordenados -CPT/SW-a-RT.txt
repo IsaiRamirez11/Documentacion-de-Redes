@@ -1,0 +1,36 @@
+enable
+conf t
+hostname SW-01
+
+! ===== CREACIÓN DE VLAN =====
+vlan 2
+ name VLAN-2
+vlan 3
+ name VLAN-3
+vlan 4
+ name VLAN-4
+vlan 5
+ name VLAN-5
+vlan 6
+ name VLAN-6
+exit
+
+! ===== TRUNK AL ROUTER =====
+interface fa0/24
+ description TRUNK-A-RT-01
+ switchport mode trunk
+ switchport trunk allowed vlan 2,3,4,5,6
+ no shutdown
+ exit
+
+! ===== TRUNKS A OTROS SWITCHES =====
+interface range gig0/1-2
+ description TRUNK-A-SWITCHES
+ switchport mode trunk
+ switchport trunk allowed vlan 2,3,4,5,6
+ no shutdown
+ exit
+
+end
+wr
+

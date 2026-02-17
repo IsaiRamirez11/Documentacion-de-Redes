@@ -1,0 +1,25 @@
+SWITCH ABAJO
+///Este solo es cerrar las vlan que le pertenecen asi como 
+
+ena
+conf term
+vlan 4
+name MECATRONICA
+exit
+vlan 5
+Name CONTABILIDAD
+exit
+Interface range Fa0/2-9
+switchport mode Access
+switchport Access vlan 4
+exit
+interface range Fa0/15-24
+switchport mode Access
+switchport Access vlan 5
+exit
+
+
+interface Gig0/1
+switchport mode trunk
+exit
+

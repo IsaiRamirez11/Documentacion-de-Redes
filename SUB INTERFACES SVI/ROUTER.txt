@@ -1,0 +1,44 @@
+ROUTER
+
+ena
+conf term
+
+Interface Gig0/0
+description SVI
+no shut
+exit
+
+Interface Gig0/0.2
+description SVI-2
+encapsulation Dot1Q 2
+ip add 000.000.000.254  255.255.255.0
+no shut
+exit
+
+Interface Gig0/0.3
+description SVI-3
+encapsulation Dot1Q 3
+ip add 000.000.000.254  255.255.255.0
+no shut
+exit
+
+Interface Gig0/0.4
+description SVI-4
+encapsulation Dot1Q 4
+ip add 000.000.000.254  255.255.255.0
+no shut
+exit
+
+Interface Gig0/0.5
+description SVI-5
+encapsulation Dot1Q 5
+ip add 000.000.000.254  255.255.255.0
+no shut
+exit
+
+Interface Gig0/0.6
+description SVI-6
+encapsulation Dot1Q 6
+ip add 000.000.000.254  255.255.255.0
+no shut
+exit

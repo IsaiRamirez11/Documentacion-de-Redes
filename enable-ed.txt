@@ -1,0 +1,242 @@
+enable
+configure terminal
+hostname R-DER
+								Interfaz WAN hacia Centro (R-MED)
+interface Serial0/0/0
+ip address 172.16.13.246 255.255.255.252
+no shutdown
+								Interfaz WAN hacia Izquierda (R-IZQ)
+interface Serial0/0/1
+ip address 172.16.13.250 255.255.255.252
+no shutdown
+								CONFIGURACIÓN LAN
+interface GigabitEthernet0/0
+no shutdown
+								Subinterfaz Operación
+interface GigabitEthernet0/0.10
+encapsulation dot1Q 10
+ip address 172.16.13.1 255.255.255.128
+								Subinterfaz Ingeniería
+interface GigabitEthernet0/0.20
+encapsulation dot1Q 20
+ip address 172.16.13.193 255.255.255.224
+exit
+
+								Agregar Rutas Correctas
+		Ruta hacia Ventas
+ip route 172.16.0.0 255.255.248.0 172.16.13.245
+		Ruta hacia Diseño
+ip route 172.16.8.0 255.255.252.0 172.16.13.245
+		Ruta hacia Gerencia
+ip route 172.16.13.128 255.255.255.192 172.16.13.245
+		Ruta hacia RH
+ip route 172.16.12.0 255.255.255.0 172.16.13.245
+
+								Ruta para que el PING entre Routers funcione - dónde está la WAN del router izquierdo
+
+ip route 172.16.13.240 255.255.255.252 172.16.13.245
+exit
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+enable
+configure terminal
+hostname SW-CEN-DER
+vlan 10
+name OPERACION
+vlan 20
+INGENIERIA
+exit
+interface GigabitEthernet0/1
+switchport mode trunk
+interface FastEthernet0/1
+switchport mode trunk
+interface FastEthernet0/2
+switchport mode trunk
+end
+…………………………………………………………………………………………………
+enable
+configure terminal
+hostname SW-OPER
+vlan 10
+name OPERACION
+exit
+interface FastEthernet0/1
+switchport mode trunk
+interface range FastEthernet0/2-9
+switchport mode access
+switchport access vlan 10
+end
+…………………………………………………………………………………………………
+
+enable
+configure terminal
+hostname SW-ING
+vlan 20
+name INGENIERIA
+exit
+interface FastEthernet0/1
+switchport mode trunk
+interface range FastEthernet0/2-9
+switchport mode access
+switchport access vlan 20
+end
+write
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+enable
+configure terminal
+hostname R-MED
+				WANs
+interface Serial0/0/0
+ip address 172.16.13.242 255.255.255.252
+no shutdown
+interface Serial0/0/1
+ip address 172.16.13.245 255.255.255.252
+no shutdown
+			LAN SERVIDOR
+interface GigabitEthernet0/0
+ip address 172.16.13.225 255.255.255.240
+no shutdown
+		Rutas hacia la IZQUIERDA
+ip route 172.16.0.0 255.255.248.0 172.16.13.241
+ip route 172.16.8.0 255.255.252.0 172.16.13.241
+ip route 172.16.12.0 255.255.255.0 172.16.13.241
+ip route 172.16.13.128 255.255.255.192 172.16.13.241
+
+		Rutas hacia la DERECHA
+ip route 172.16.13.0 255.255.255.128 172.16.13.246
+ip route 172.16.13.192 255.255.255.224 172.16.13.246
+exit
+write
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+enable
+configure terminal
+hostname R-IZQ
+									WANs
+interface Serial0/0/0
+ip address 172.16.13.241 255.255.255.252
+no shutdown
+interface Serial0/0/1
+ip address 172.16.13.249 255.255.255.252
+no shutdown
+								LAN GERENCIA (Física, NO es VLAN)
+interface GigabitEthernet0/0
+ip address 172.16.13.129 255.255.255.192
+no shutdown
+								LAN VLANs (Hacia Switch)
+interface GigabitEthernet0/1
+no shutdown
+									Ventas
+interface GigabitEthernet0/1.10
+encapsulation dot1Q 10
+ip address 172.16.0.1 255.255.248.0
+									Diseño
+interface GigabitEthernet0/1.40
+encapsulation dot1Q 40
+ip address 172.16.8.1 255.255.252.0
+									RH
+interface GigabitEthernet0/1.30
+encapsulation dot1Q 30
+ip address 172.16.12.1 255.255.255.0
+exit
+enable
+
+								     IP ROUTE....
+							Ruta hacia Operación (Derecha)
+ip route 172.16.13.0 255.255.255.128 172.16.13.242
+							Ruta hacia Ingeniería (Derecha)
+ip route 172.16.13.192 255.255.255.224 172.16.13.242
+				Ruta para que el PING entre Routers funcione - dónde está la WAN del router derecho
+ip route 172.16.13.244 255.255.255.252 172.16.13.242
+exit
+end
+
+…………………………………………………………………………………………………
+
+enable
+configure terminal
+hostname SW-GERENCIA
+interface range FastEthernet0/2-24
+description LAN_GERENCIA
+switchport mode access
+spanning-tree portfast
+exit
+					Configuración del enlace hacia el Router
+interface FastEthernet0/1
+description CONEXION_ROUTER
+switchport mode access
+no shutdown
+exit
+end
+write
+
+…………………………………………………………………………………………………
+
+enable
+configure terminal
+hostname SW-RH
+vlan 10
+name VENTAS
+vlan 30
+name RH
+vlan 40
+name DISENO
+exit
+					Configuración del enlace hacia el Router
+interface FastEthernet0/1
+description TRUNK_A_ROUTER
+switchport mode trunk
+switchport trunk allowed vlan 10,30,40,1
+no shutdown
+exit
+					Configuración del enlace hacia el Switch Ventas y Diseño
+interface FastEthernet0/2
+description TRUNK_A_SW_ABAJO
+switchport mode trunk
+switchport trunk allowed vlan 10,30,40,1
+no shutdown
+exit
+					Configuración de la VLAN RH
+interface range FastEthernet0/3-24
+description USUARIOS_RH
+switchport mode access
+switchport access vlan 30
+spanning-tree portfast
+exit
+
+
+…………………………………………………………………………………………………
+
+enable
+configure terminal
+hostname SW-VENTAS-DISENO
+vlan 10
+name VENTAS
+vlan 40
+name DISENO
+exit
+					Configuración del enlace hacia el Switch RH
+interface FastEthernet0/1
+description TRUNK_A_SW_ARRIBA
+switchport mode trunk
+switchport trunk allowed vlan 10,40,1
+no shutdown
+exit
+					Configuración de las VLANs
+interface range FastEthernet0/2-9
+description USUARIOS_DISENO
+switchport mode access
+switchport access vlan 40
+spanning-tree portfast
+exit
+interface range FastEthernet0/10-20
+description USUARIOS_VENTAS
+switchport mode access
+switchport access vlan 10
+spanning-tree portfast
+exit
+…………………………………………………………………………………………………

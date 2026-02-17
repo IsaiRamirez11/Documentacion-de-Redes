@@ -1,0 +1,38 @@
+MODELO BASE - VLAN, TRUNK, SERIAL Y RUTAS ESTATICAS
+
+================ SWITCH ================= enable configure terminal
+
+vlan 10 name Ventas vlan 20 name RH exit
+
+interface fa0/1 switchport mode access switchport access vlan 10 exit
+
+interface fa0/2 switchport mode access switchport access vlan 20 exit
+
+interface fa0/24 switchport mode trunk exit
+
+end write
+
+================ ROUTER (ROUTER ON A STICK) ================= enable
+configure terminal
+
+interface g0/0 no shutdown exit
+
+interface g0/0.10 encapsulation dot1Q 10 ip address 192.168.10.1
+255.255.255.0 exit
+
+interface g0/0.20 encapsulation dot1Q 20 ip address 192.168.20.1
+255.255.255.0 exit
+
+================ SERIAL ================= ! Router DCE interface s0/0/0
+ip address 10.1.0.1 255.255.255.252 clock rate 64000 no shutdown exit
+
+! Router vecino interface s0/0/0 ip address 10.1.0.2 255.255.255.252 no
+shutdown exit
+
+================ RUTAS ESTATICAS ================= ! Sintaxis ip route
+RED_DESTINO MASCARA NEXT_HOP
+
+! Ejemplo ip route 192.168.2.0 255.255.255.0 10.1.0.2
+
+================ VERIFICACION ================= show vlan show
+interfaces trunk show ip route show ip interface brief

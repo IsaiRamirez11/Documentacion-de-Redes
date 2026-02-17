@@ -1,0 +1,50 @@
+RT-01
+ena
+conf t
+interf gig0/1.3
+encapsu dot 3
+ip add 172.16.3.254 255.255.255.0
+interface gig0/1.4
+encapsu dot 4
+ip add 172.16.4.254 255.255.255.0
+interf gig0/1.5
+encapsu dot 5
+ip add 172.16.5.254 255.255.255.0
+interface gig0/1.6
+encapsu dot 6
+ip add 172.16.6.254 255.255.255.0
+interf gig0/1.7
+encapsu dot 7
+ip add 172.16.7.254 255.255.255.0
+interf gig0/1
+no shut
+interf s0/0/0 
+ip add 10.1.1.1 255.255.255.252
+cloc rate 64000
+no shut
+exit
+ip route 192.168.2.0 255.255.255.0 10.1.1.2
+
+
+
+RT-02
+ena 
+conf t
+interf gig0/1.2
+encapsu dot 2
+ip add 192.168.2.254 255.255.255.0
+interf gig0/1
+no shut
+interf s0/0/0
+ip add 10.1.1.2 255.255.255.252
+no shut
+exit
+ip route 172.16.3.0 255.255.255.0 10.1.1.1
+ip route 172.16.4.0 255.255.255.0 10.1.1.1
+ip route 172.16.5.0 255.255.255.0 10.1.1.1
+ip route 172.16.6.0 255.255.255.0 10.1.1.1
+ip route 172.16.7.0 255.255.255.0 10.1.1.1
+do wr
+
+
+

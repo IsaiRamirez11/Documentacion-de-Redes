@@ -1,0 +1,12 @@
+enable
+conf t
+
+interface Vlan1
+ ip address 10.1.1.2 255.255.255.0
+ no shutdown
+ exit
+
+ip default-gateway 10.1.1.1
+
+end
+copy run start

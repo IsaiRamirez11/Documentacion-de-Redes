@@ -1,0 +1,28 @@
+enable
+conf t
+hostname RT-01
+
+interface GigabitEthernet0/0
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+ exit
+
+interface GigabitEthernet0/1
+ ip address 192.168.11.1 255.255.255.0
+ no shutdown
+ exit
+
+interface Serial0/1/0
+ ip address 209.165.200.225 255.255.255.252
+ clock rate 64000
+ no shutdown
+ exit
+
+! Ruta estatica principal
+ip route 0.0.0.0 0.0.0.0 209.165.200.226
+
+! Ruta estatica flotante (backup)
+ip route 0.0.0.0 0.0.0.0 209.165.200.226 10
+
+end
+copy run start

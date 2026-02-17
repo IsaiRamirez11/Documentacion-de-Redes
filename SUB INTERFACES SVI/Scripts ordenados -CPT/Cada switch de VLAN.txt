@@ -1,0 +1,49 @@
+enable
+conf t
+hostname SW-01
+
+! ===== CREACIÓN DE VLAN =====
+vlan 2
+ name VLAN-2
+vlan 3
+ name VLAN-3
+vlan 4
+ name VLAN-4
+vlan 5
+ name VLAN-5
+vlan 6
+ name VLAN-6
+exit
+
+! ===== PUERTOS DE ACCESO (EJEMPLO) =====
+interface range fa0/2-9
+ description ACCESS-VLAN-2
+ switchport mode access
+ switchport access vlan 2
+ no shutdown
+ exit
+
+interface range fa0/10-14
+ description ACCESS-VLAN-6
+ switchport mode access
+ switchport access vlan 6
+ no shutdown
+ exit
+
+interface range fa0/15-24
+ description ACCESS-VLAN-5
+ switchport mode access
+ switchport access vlan 5
+ no shutdown
+ exit
+
+! ===== TRUNK AL CORE =====
+interface gig0/1
+ description TRUNK-A-SW-CORE
+ switchport mode trunk
+ switchport trunk allowed vlan 2,3,4,5,6
+ no shutdown
+ exit
+
+end
+wr
