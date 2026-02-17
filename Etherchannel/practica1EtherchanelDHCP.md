@@ -1,6 +1,5 @@
-# Configuración de Red
+# Configuración de EtherChannel · STP · VLAN · DHCP
 
-## EtherChannel · STP · VLAN · DHCP
 
 
 
@@ -138,10 +137,8 @@ No shut
 
 # PKT
 
+![Referencia a imagen de los comandos](img/img.png)
 
-
-
-img/imagen.img
 
 
 

@@ -1,4 +1,4 @@
-sub interfaz lógica en el router
+!sub interfaz lógica en el router
 
 ena
 conf t
@@ -6,7 +6,10 @@ interface gig0/0
 description SVI
 no shut
 
-exit
+exit: 
+
+!Los .x eje 0.2 varea dependiendo de la subinterfaz en este caso la VLAN
+!Poniendo en este caso la ip de la GATEWAY de cada VLAN
 
 interface gig0/0.2
 description SVI-2
