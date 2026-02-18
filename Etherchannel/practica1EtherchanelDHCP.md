@@ -5,7 +5,7 @@
 
 #  SWITCH DE ENLACES REDUNDANTES (SW-01)
 
-```bash
+```
 ena
 conf term
 hostname SW-01
