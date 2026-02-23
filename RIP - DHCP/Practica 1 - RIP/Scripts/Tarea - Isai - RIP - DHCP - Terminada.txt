@@ -1,0 +1,257 @@
+!Tarea - Isai - RIP
+
+!--------------------------------- Router Izquierdo RT-01 – Lado Izquierdo ---------------------------
+
+
+ena 
+conf term
+hostname RT-01
+
+interface g0/0
+ip address 172.16.1.254 255.255.255.0
+no shutdown
+exit
+
+interface g0/1
+ip address 172.16.5.254 255.255.255.0
+no shutdown
+exit
+
+interface s0/0/0
+ip address 10.1.1.1 255.255.255.252
+no shutdown
+exit
+
+interface s0/0/1
+ip address 10.4.4.1 255.255.255.252
+no shutdown
+exit
+
+!---------------- DHCP SOLO PARA 172.16.1.0  tiene serviores no tienen la configuración DHCP asi que la configuramos desde el router  ----------------
+
+!Primeras IP utilizables
+ip dhcp excluded-address 172.16.1.1 172.16.1.10
+!Para el router la .254
+ip dhcp excluded-address 172.16.1.254
+!Para el switch la .253
+ip dhcp excluded-address 172.16.1.253
+!Para el servidor la .252
+ip dhcp excluded-address 172.16.1.252
+
+
+ip dhcp pool LAN-POO-1
+network 172.16.1.0 255.255.255.0
+default-router 172.16.1.254
+
+! no hay servidor DNS por lo que no se pone 
+no dns-server
+
+domain-name isai.com
+exit
+
+router rip
+version 2
+no auto-summary
+network 172.16.0.0
+
+!10.0.0.0 significa que acctive todas las interfaces que lleven el 10. como primer octeto
+
+network 10.0.0.0
+
+
+exit
+
+end
+copy run start
+
+
+!--------------------------------- Router Arriba RT-02 – Parte Superior ---------------------------
+
+ena 
+conf term
+hostname RT-02
+
+interface g0/0
+ip address 172.16.10.254 255.255.255.0
+no shutdown
+exit
+
+
+interface s0/0/0
+ip address 10.1.1.2 255.255.255.252
+no shutdown
+
+interface s0/0/1
+ip address 10.2.2.1 255.255.255.252
+no shutdown
+exit
+
+!---------------- DHCP SOLO PARA 172.16.10.0  tiene serviores no tienen la configuración DHCP  ----------------
+
+!Primeras IP utilizables
+ip dhcp excluded-address 172.16.10.1 172.16.10.10
+!Para el router la .254
+ip dhcp excluded-address 172.16.10.254
+!Para el acces point la .253
+ip dhcp excluded-address 172.16.10.253
+!Para el servidor la .252
+ip dhcp excluded-address 172.16.10.252
+
+
+ip dhcp pool LAN-POO-1
+network 172.16.10.0 255.255.255.0
+default-router 172.16.10.254
+
+!En esta sección no hay servidor DNS por lo que no se pone 
+no dns-server
+
+domain-name isai.com
+exit
+
+no router rip
+router rip
+version 2
+no auto-summary
+network 172.16.0.0
+
+!10.0.0.0 significa que acctive todas las interfaces que lleven el 10. como primer octeto
+
+network 10.0.0.0
+
+
+exit
+
+end
+copy run start
+
+
+!--------------------------------- Router Derecho RT-03 – Lado Derecho ---------------------------
+
+
+
+ena 
+conf term
+hostname RT-03
+
+interface g0/0
+ip address 192.168.10.254 255.255.255.0
+no shutdown
+exit
+
+interface g0/1
+ip address 192.168.5.254 255.255.255.0
+no shutdown
+exit
+
+interface s0/0/0
+ip address 10.2.2.2 255.255.255.252
+
+no shutdown
+
+interface s0/0/1
+ip address 10.3.3.1 255.255.255.252
+no shutdown
+exit
+
+!---------------- DHCP SOLO PARA 192.168.5.0 tiene serviores no tienen la configuración DHCP  ----------------
+
+!Primeras IP utilizables
+ip dhcp excluded-address 192.168.5.1 192.168.5.10
+!Para el router la .254
+ip dhcp excluded-address 192.168.5.254
+!Para el acces point la .253
+ip dhcp excluded-address 192.168.5.253
+!Para el servidor la .252
+ip dhcp excluded-address 192.168.5.252
+
+
+ip dhcp pool LAN-POO-1
+network 192.168.5.0 255.255.255.0
+default-router 192.168.5.254
+
+!En esta sección no hay servidor DNS por lo que no se pone 
+no dns-server
+
+domain-name isai.com
+exit
+
+no router rip
+router rip
+version 2
+no auto-summary
+network 192.168.5.0
+network 192.168.10.0
+
+!10.0.0.0 significa que acctive todas las interfaces que lleven el 10. como primer octeto
+
+network 10.0.0.0
+
+exit
+
+end
+copy run start
+
+
+!--------------------------------- Router Abajo RT-04 – Parte Inferior ---------------------------
+
+
+ena 
+conf term
+hostname RT-04
+
+interface g0/0
+ip address 192.168.1.254 255.255.255.0
+no shutdown
+exit
+
+
+
+interface s0/0/0
+ip address 10.3.3.2 255.255.255.252
+
+no shutdown
+
+interface s0/0/1
+ip address 10.4.4.2 255.255.255.252
+no shutdown
+exit
+
+!---------------- DHCP SOLO PARA 192.168.1.0 que es la que aunque tiene serviores no tienen la configuración DHCP  ----------------
+
+!Primeras IP utilizables
+ip dhcp excluded-address 192.168.1.1 192.168.1.10
+!Para el router la .254
+ip dhcp excluded-address 192.168.1.254
+!Para el servidor la .252
+ip dhcp excluded-address 192.168.1.252
+
+
+ip dhcp pool LAN-POO-1
+network 192.168.1.0 255.255.255.0
+default-router 192.168.1.254
+
+!En esta sección no hay servidor DNS por lo que no se pone 
+no dns-server
+
+domain-name isai.com
+exit
+
+no router rip
+router rip
+version 2
+no auto-summary
+network 192.168.1.0
+
+
+!10.0.0.0 significa que acctive todas las interfaces que lleven el 10. como primer octeto
+
+network 10.0.0.0
+
+exit
+
+end
+copy run start
+
+
+
+

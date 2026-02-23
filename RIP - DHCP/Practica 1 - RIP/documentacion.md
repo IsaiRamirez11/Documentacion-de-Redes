@@ -1,5 +1,5 @@
 
-
+## Si desean copiar la practica asi como los scripts recuerden cambiar el dominio del DNS y engeneral revisar la parctica ya que esta practica tiene mi nombre por lo que les pido remplacen por el de ustendes, tanto dentro del servidor - services - DNS - ahi esta mi nombre y tanto en la configuracion del router en el domain-name ya que se encuentra con el dominio  isai.com que hace referencia a mi nombre 
 ##  Implementación de RIP v2
 
 En cada router configuré:
