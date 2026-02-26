@@ -1,0 +1,428 @@
+Calase Virtual ISAI
+
+!------------------- RT-01 IZQUIERDO --------------------------
+
+ena
+conf term
+hostname RT-01
+
+interface g0/0
+no shutdown
+exit
+
+interface g0/0.6
+encapsulation dot1Q 6
+ip address 192.168.6.254 255.255.255.0
+exit
+
+interface g0/0.7
+encapsulation dot1Q 7
+ip address 192.168.7.254 255.255.255.0
+exit
+
+
+interface s0/0/0
+ip address 10.2.2.1 255.255.255.252
+no shutdown
+
+
+
+!---------- DHCP DE LA VLAN 6 -------------------------
+
+ip dhcp excluded-address 192.168.6.1 192.168.6.10
+ip dhcp excluded-address 192.168.6.252 192.168.6.254
+
+ip dhcp pool VLAN6
+network 192.168.6.0 255.255.255.0
+default-router 192.168.6.254
+dns-server 192.168.6.252
+domain-name isai.com
+exit
+
+!---------- DHCP DE LA VLAN 7 -------------------------
+
+
+ip dhcp excluded-address 192.168.7.1 192.168.7.10
+ip dhcp excluded-address 192.168.7.252 192.168.7.254
+
+ip dhcp pool VLAN7
+network 192.168.7.0 255.255.255.0
+default-router 192.168.7.254
+dns-server 192.168.7.252
+domain-name isai.com
+exit
+
+! ------------------------ RIP -----------------------------------
+
+router rip
+version 2
+no auto-summary
+network 192.168.6.0
+network 192.168.7.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+
+
+
+!//////////////////////////////////// SWITCHES //////////////////////////////////////////////////////////
+
+
+!------------------- SWITCH 01 DE LA VLAN 6 Y 7  --------------------------
+
+
+
+ena
+conf term
+hostname SW-01
+
+vlan 6
+name CONTADURIA
+exit
+
+vlan 7
+name QUIMICA
+exit
+
+interface range fa0/2-8
+switchport mode access
+switchport access vlan 6
+exit
+
+interface range fa0/9-19
+switchport mode access
+switchport access vlan 7
+exit
+
+interface range fa0/1-2
+switchport mode trunk
+channel-group 1 mode active
+exit
+
+interface port-channel 1
+switchport mode trunk
+exit
+
+end
+copy run start
+
+
+!------------------ SWITCH-02 DE LA VLAN 6 QUE VA AL RITIER ---------------
+
+ena
+conf term
+hostname SW-02
+
+vlan 6
+name CONTADURIA
+exit
+
+vlan 7
+name QUIMICA
+exit
+
+interface range fa0/2-8
+switchport mode access
+switchport access vlan 6
+exit
+
+interface range fa0/9-19
+switchport mode access
+switchport access vlan 7
+exit
+
+interface range fa0/1-2
+switchport mode trunk
+channel-group 1 mode active
+exit
+
+interface port-channel 1
+switchport mode trunk
+exit
+
+interface gig0/1
+switchport mode trunk
+exit
+
+end
+copy run start
+
+
+! ---------------------------- RT-02 ENMEDIO ---------------------------------
+
+ena
+conf term
+hostname RT-02
+
+interface g0/0
+no shutdown
+exit
+
+interface g0/0.2
+encapsulation dot1Q 2
+ip address 172.16.2.254 255.255.255.0
+exit
+
+interface g0/0.3
+encapsulation dot1Q 3
+ip address 172.16.3.254 255.255.255.0
+exit
+
+
+interface g0/1
+no shutdown
+exit
+
+interface g0/1.4
+encapsulation dot1Q 4
+ip address 172.16.4.254 255.255.255.0
+exit
+
+interface g0/1.5
+encapsulation dot1Q 5
+ip address 172.16.5.254 255.255.255.0
+exit
+
+
+interface s0/0/0
+ip address 10.2.2.2 255.255.255.252
+no shutdown
+exit
+
+interface s0/0/1
+ip address 10.1.1.2 255.255.255.252
+no shutdown
+exit
+
+!---------- DHCP DE LA VLAN 2 -------------------------
+
+ip dhcp excluded-address 172.16.2.1 172.16.2.10
+ip dhcp excluded-address 172.16.2.252 172.16.2.254
+
+ip dhcp pool VLAN2
+network 172.16.2.0 255.255.255.0
+default-router 172.16.2.254
+dns-server 172.16.2.252
+domain-name isai.com
+exit
+
+!---------- DHCP DE LA VLAN 3 -------------------------
+
+ip dhcp excluded-address 172.16.3.1 172.16.3.10
+ip dhcp excluded-address 172.16.3.252 172.16.3.254
+
+ip dhcp pool VLAN3
+network 172.16.3.0 255.255.255.0
+default-router 172.16.3.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+!---------- DHCP DE LA VLAN 4 -------------------------
+
+ip dhcp excluded-address 172.16.4.1 172.16.4.10
+ip dhcp excluded-address 172.16.4.252 172.16.4.254
+
+ip dhcp pool VLAN4
+network 172.16.4.0 255.255.255.0
+default-router 172.16.4.254
+dns-server 172.16.4.252
+domain-name isai.com
+exit
+
+!---------- DHCP DE LA VLAN 5 -------------------------
+
+ip dhcp excluded-address 172.16.5.1 172.16.5.10
+ip dhcp excluded-address 172.16.5.252 172.16.5.254
+
+ip dhcp pool VLAN5
+network 172.16.5.0 255.255.255.0
+default-router 172.16.5.254
+dns-server 172.16.5.252
+domain-name isai.com
+exit
+
+!-----------------RIP--------------------------------
+
+router rip
+version 2
+no auto-summary
+network 172.16.2.0
+network 172.16.3.0
+network 172.16.4.0
+network 172.16.5.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+
+!///////////////////////////////////// SWITCHES ///////////////////////////////////////////////////////
+
+
+
+!------------------------------- SWITCH-03 DE 2 Y 3 ----------------------------
+
+ena
+conf term
+hostname SW-03
+
+vlan 2
+name RH
+exit
+
+vlan 3
+name MKT
+exit
+
+interface range fa0/2-8
+switchport mode access
+switchport access vlan 2
+exit
+
+interface range fa0/9-19
+switchport mode access
+switchport access vlan 3
+exit
+
+interface gig0/1
+switchport mode trunk
+exit
+
+end
+copy run start
+
+
+!------------------------------- SWITCH-04 DE 4 Y 5 ----------------------------
+
+
+ena
+conf term
+hostname SW-04
+
+vlan 4
+name TIC
+exit
+
+vlan 5
+name SITE
+exit
+
+interface range fa0/2-8
+switchport mode access
+switchport access vlan 4
+exit
+
+interface range fa0/9-20
+switchport mode access
+switchport access vlan 5
+exit
+
+interface gig0/1
+switchport mode trunk
+exit
+
+end
+copy run start
+
+
+
+!---------------------------- RT-03 arriba ----------------------------------
+
+
+ena
+conf term
+hostname RT-03
+
+interface g0/0
+ip address 172.16.1.254 255.255.255.0
+no shutdown
+exit
+
+
+interface g0/1
+ip address 10.3.3.2 255.255.255.252
+no shutdown
+exit
+
+interface s0/0/0
+ip address 10.1.1.1 255.255.255.252
+no shutdown
+exit
+
+!---------- DHCP -------------------------
+
+ip dhcp excluded-address 172.16.1.1 172.16.1.10
+ip dhcp excluded-address 172.16.1.252 172.16.1.254
+
+ip dhcp pool VLAN1
+network 172.16.1.0 255.255.255.0
+default-router 172.16.1.254
+dns-server 172.16.1.252
+domain-name isai.com
+exit
+
+!----------------- RIP -------------------
+
+router rip
+version 2
+no auto-summary
+network 172.16.1.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+!---------------------------------------------------------
+
+!-----------------------SWITCH DE CAPA 3 --------------
+
+
+
+
+ena
+conf term 
+hostname SW-01-CAPA3
+
+
+vlan 50
+name C3
+exit
+
+interface vlan 50
+description MSI default Gateway for svi 50
+ip add 192.168.50.254 255.255.255.0
+no shut
+exit
+
+interface Gig1/0/2
+description pc01-vlan-50
+switchport mode Access
+switchport Acces vlan 50
+exit
+end
+
+conf term
+ip routing
+
+
+!Enrutamiento
+
+! puerto que va al router
+
+interface Gig1/0/1
+no switchport
+ip address 10.3.3.1 255.255.255.252
+no shut
+exit
+
+router rip
+version 2
+no auto-summary
+network 192.168.50.0
+network 10.0.0.0
