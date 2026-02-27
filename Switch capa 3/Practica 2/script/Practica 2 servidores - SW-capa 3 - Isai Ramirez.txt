@@ -1,0 +1,380 @@
+!------------------- RT-01 DERECHO --------------------------
+
+ena
+conf term
+hostname RT-01-Derecho
+
+interface g0/0
+no shutdown
+exit
+
+interface g0/0.2
+encapsulation dot1Q 2
+ip address 172.16.2.254 255.255.255.0
+exit
+
+interface g0/0.3
+encapsulation dot1Q 3
+ip address 172.16.3.254 255.255.255.0
+exit
+
+
+interface s0/0/0
+ip address 10.1.1.1 255.255.255.252
+no shutdown
+
+!-----------------------------------------------------
+
+interface g0/1
+no shutdown
+ip address 172.16.4.254 255.255.255.0
+exit
+
+
+
+
+!---------- DHCP DE LA VLAN 2 -------------------------
+
+ip dhcp excluded-address 172.16.2.1 172.16.2.10
+ip dhcp excluded-address 172.16.2.252 172.16.2.254
+
+ip dhcp pool VLAN2
+network 172.16.2.0 255.255.255.0
+default-router 172.16.2.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+!---------- DHCP DE LA VLAN 3 -------------------------
+
+ip dhcp excluded-address 172.16.3.1 172.16.3.10
+ip dhcp excluded-address 172.16.3.252 172.16.3.254
+
+ip dhcp pool VLAN3
+network 172.16.3.0 255.255.255.0
+default-router 172.16.3.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!---------- DHCP DE LA VLAN 4 -------------------------
+
+
+ip dhcp excluded-address 172.16.4.1 172.16.4.10
+ip dhcp excluded-address 172.16.4.252 172.16.4.254
+
+ip dhcp pool VLAN4
+network 172.16.4.0 255.255.255.0
+default-router 172.16.4.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+! ------------------------ RIP -----------------------------------
+
+router rip
+version 2
+no auto-summary
+network 172.16.4.0
+network 172.16.3.0
+network 172.16.2.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+
+
+!---------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
+!--------------- SWITCH DE VLAN 2 Y 3 ARRIBA DERECHO -----------------------------
+!---------------------------------------------------------------------------------
+!---------------------------------------------------------------------------------
+
+
+ena
+conf term
+hostname SW-01
+
+vlan 2
+name ESPACIAL
+exit
+
+vlan 3
+name AREA-51
+exit
+
+interface Gig0/1
+no shut
+exit
+
+interface range fa0/2-8
+switchport mode access
+switchport access vlan 2
+exit
+
+interface range fa0/9-19
+switchport mode access
+switchport access vlan 3
+exit
+
+interface range Gig0/1-2
+switchport mode trunk
+channel-group 1 mode active
+exit
+
+interface port-channel 1
+switchport mode trunk
+exit
+
+end
+copy run start
+
+
+
+
+!---------------------------------------------------------------------------------
+!--------------- ROUTER 2 IZQUIERDO ----------------------------------------------
+!---------------------------------------------------------------------------------
+
+ena
+conf term
+hostname RT-02-IZQUIERDO
+
+
+!------------------- RED DEL SERVIDOR E-MAIL ----------------------
+
+interface g0/0
+ip address 172.16.1.254 255.255.255.0
+no shutdown
+exit
+
+
+!------------------- ENLACE AL SWITCH CAPA 3 ----------------------
+
+interface g0/1
+ip address 10.2.2.2 255.255.255.252
+no shutdown
+exit
+
+
+!------------------- ENLACE SERIAL AL ROUTER DERECHO --------------
+
+interface s0/0/0
+ip address 10.1.1.2 255.255.255.252
+no shutdown
+exit
+
+
+
+!------------------------ DHCP DEL SERVODOR -----------------------
+
+ip dhcp excluded-address 172.16.1.1 172.16.1.10
+ip dhcp excluded-address 172.16.1.252 172.16.1.254
+
+ip dhcp pool VLANSERVIDOR
+network 172.16.1.0 255.255.255.0
+default-router 172.16.1.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+
+!------------------------ RIP -----------------------------------
+
+router rip
+version 2
+no auto-summary
+network 172.16.1.0
+network 10.0.0.0
+exit
+
+
+end
+copy run start
+
+
+!-----------------------------------------------------------------
+!---------------- Switch de capa 3 -------------------------------
+!-----------------------------------------------------------------
+
+ena
+conf term 
+hostname SW-01-CAPA3
+
+ip routing
+
+vlan 5
+name SERVER-FTP
+exit
+
+vlan 6
+name SERVER-WEB
+exit
+
+vlan 20
+name VIA-LACTEA
+exit
+
+vlan 30
+name ANDROMEDA
+exit
+
+vlan 40
+name MAGALLANES
+exit
+
+
+interface vlan 5
+description MSI default Gateway for svi 
+ip address 172.16.5.254 255.255.255.0
+no shutdown
+exit
+
+interface vlan 6
+description MSI default Gateway for svi 
+ip address 172.16.6.254 255.255.255.0
+no shutdown
+exit
+
+interface vlan 20
+ip address 172.16.20.254 255.255.255.0
+no shutdown
+exit
+
+interface vlan 30
+ip address 172.16.30.254 255.255.255.0
+no shutdown
+exit
+
+interface vlan 40
+ip address 172.16.40.254 255.255.255.0
+no shutdown
+exit
+
+
+interface Gig1/0/20
+description vlan-5
+switchport mode access
+switchport access vlan 5
+exit
+
+interface Gig1/0/22
+description vlan-6
+switchport mode access
+switchport access vlan 6
+exit
+
+interface Gig1/0/5
+description vlan-40
+switchport mode access
+switchport access vlan 40
+exit
+
+interface Gig1/0/15
+description vlan-30
+switchport mode access
+switchport access vlan 30
+exit
+
+interface Gig1/0/10
+description vlan-20
+switchport mode access
+switchport access vlan 20
+exit
+
+
+! puerto que va al router
+
+interface Gig1/0/1
+no switchport
+ip address 10.2.2.1 255.255.255.252
+no shutdown
+exit
+
+
+!------------------------ DHCP DE LA VLAN 5 -----------------------
+
+ip dhcp excluded-address 172.16.5.1 172.16.5.10
+ip dhcp excluded-address 172.16.5.252 172.16.5.254
+
+ip dhcp pool VLAN5
+network 172.16.5.0 255.255.255.0
+default-router 172.16.5.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!------------------------ DHCP DE LA VLAN 6 -----------------------
+
+ip dhcp excluded-address 172.16.6.1 172.16.6.10
+ip dhcp excluded-address 172.16.6.252 172.16.6.254
+
+ip dhcp pool VLAN6
+network 172.16.6.0 255.255.255.0
+default-router 172.16.6.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!------------------------ DHCP DE LA VLAN 20 -----------------------
+
+ip dhcp excluded-address 172.16.20.1 172.16.20.10
+ip dhcp excluded-address 172.16.20.252 172.16.20.254
+
+ip dhcp pool VLAN20
+network 172.16.20.0 255.255.255.0
+default-router 172.16.20.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!------------------------ DHCP DE LA VLAN 30 -----------------------
+
+ip dhcp excluded-address 172.16.30.1 172.16.30.10
+ip dhcp excluded-address 172.16.30.252 172.16.30.254
+
+ip dhcp pool VLAN30
+network 172.16.30.0 255.255.255.0
+default-router 172.16.30.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!------------------------ DHCP DE LA VLAN 40 -----------------------
+
+ip dhcp excluded-address 172.16.40.1 172.16.40.10
+ip dhcp excluded-address 172.16.40.252 172.16.40.254
+
+ip dhcp pool VLAN40
+network 172.16.40.0 255.255.255.0
+default-router 172.16.40.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!------------------------ RIP --------------------------
+
+router rip
+version 2
+no auto-summary
+network 172.16.5.0
+network 172.16.6.0
+network 172.16.20.0
+network 172.16.30.0
+network 172.16.40.0
+network 10.0.0.0
+!passive-interface default
+!no passive-interface Gig1/0/1
+exit
+
+end
+copy run start
