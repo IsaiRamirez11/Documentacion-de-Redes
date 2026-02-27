@@ -1,0 +1,35 @@
+EIGRP 5 - ISAI RAMIREZ 
+
+! DIFERENCIA DEL RIP ESTA SI LLEVA MASCARA DE SUBRED 
+
+!Configuración del 
+
+Router EIGRP 5
+network 172.16.1.0 255.255.255.0
+network 172.2.2.0 255.255.255.0
+network 172.1.1.0 255.255.255.0
+
+no auto-sumary
+
+
+!----------------- OSPF 5 --------------------
+
+!En esta es la inversa de la mascara ósea restamos toda la mascara por ejemplo
+!Si tenemos la mascara de red con prefijo /24 su mascara es 255.255.255.0
+!Por lo que se le resta una mascara completa la mascara completa es 255.255.255.255
+!La resta quedaría asi 255.255.255.255 - 255.255.255.0 = 0.0.0.255
+!Si es prefijo /30 seria 255.255.255.255 - 255.255.255.252 = 0.0.0.3
+!Se resta octeto por octeto
+
+!Congiguracion de OSPF
+
+Router OSPF 5
+
+Router EIGRP 5
+network 172.16.1.0 0.0.0.3 area 1
+network 172.2.2.0 0.0.0.3 area 1
+network 172.1.1.0 0.0.0.3 area 1
+
+
+
+- OSPF 8
