@@ -1,0 +1,364 @@
+!    PLANTILLA ISAI RAMIREZ PALMA 
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+!----------------- Router con la configuración de varias vlan en una misma interfaz -------------------------
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ena
+conf term
+hostname RT-01
+
+!------------------------------------------------
+! INTERFAZ FISICA HACIA EL SWITCH
+!------------------------------------------------
+
+interface g0/0
+no shutdown
+exit
+
+
+!------------------------------------------------
+! VLAN 10
+!------------------------------------------------
+
+interface g0/0.10
+encapsulation dot1Q 10
+description VLAN10
+ip address 192.168.10.254 255.255.255.0
+no shutdown
+exit
+
+
+!------------------------------------------------
+! VLAN 20
+!------------------------------------------------
+
+interface g0/0.20
+encapsulation dot1Q 20
+description VLAN20
+ip address 192.168.20.254 255.255.255.0
+no shutdown
+exit
+
+
+!------------------------------------------------
+! VLAN 30
+!------------------------------------------------
+
+interface g0/0.30
+encapsulation dot1Q 30
+description VLAN30
+ip address 192.168.30.254 255.255.255.0
+no shutdown
+exit
+
+
+!------------------------------------------------
+! DHCP PARA VLAN 
+!------------------------------------------------
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.10
+ip dhcp excluded-address 192.168.10.1 192.168.10.10
+
+ip dhcp pool VLAN10
+network 192.168.10.0 255.255.255.0
+default-router 192.168.10.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+!------------------------------------------------
+! DHCP PARA VLAN 
+!------------------------------------------------
+
+ip dhcp excluded-address 192.168.20.1 192.168.20.10
+ip dhcp excluded-address 192.168.20.1 192.168.20.10
+
+ip dhcp pool VLAN20
+network 192.168.20.0 255.255.255.0
+default-router 192.168.20.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+!------------------------------------------------
+! DHCP PARA VLAN 
+!------------------------------------------------
+
+ip dhcp excluded-address 192.168.30.1 192.168.30.10
+ip dhcp excluded-address 192.168.30.1 192.168.30.10
+
+ip dhcp pool VLAN30
+network 192.168.30.0 255.255.255.0
+default-router 192.168.30.254
+dns-server 172.16.3.252
+domain-name isai.com
+exit
+
+
+!------------------------------------------------
+! ENLACE SERIAL A OTRO ROUTER
+!------------------------------------------------
+
+interface s0/0/0
+ip address 10.1.1.1 255.255.255.252
+no shutdown
+exit
+
+
+!------------------------------------------------
+! RIP
+!------------------------------------------------
+
+router rip
+version 2
+no auto-summary
+network 192.168.10.0
+network 192.168.20.0
+network 192.168.30.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+!------------------------- ROUTER CON IP HELPER -----------------------------------------------------
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+!------------------------------------------------
+! ROUTER CON IP HELPER (DHCP REMOTO)
+!------------------------------------------------
+
+ena
+conf term
+hostname RT-IPHELPER
+
+interface g0/0
+no shutdown
+exit
+
+
+! VLAN 10
+interface g0/0.10
+encapsulation dot1Q 10
+ip address 192.168.10.254 255.255.255.0
+
+! DHCP al servidor
+ip helper-address 172.16.1.10
+no shutdown
+exit
+
+
+! VLAN 20
+interface g0/0.20
+encapsulation dot1Q 20
+ip address 192.168.20.254 255.255.255.0
+
+! Servidor DHCP 
+ip helper-address 172.16.1.10
+no shutdown
+exit
+
+
+! ENLACES SERIAL
+
+interface s0/0/0
+ip address 10.1.1.2 255.255.255.252
+no shutdown
+exit
+
+
+! RIP
+
+router rip
+version 2
+no auto-summary
+network 192.168.10.0
+network 192.168.20.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+!------------------------- SWITCH TRONCAL  Para que varias VLAN pasen por la misma interfaz del router -------------------------------------------------
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ena
+conf term
+hostname SW-01
+
+vlan 10
+name ADMIN
+exit
+
+vlan 20
+name RH
+exit
+
+vlan 30
+name SISTEMAS
+exit
+
+
+!-----------------------------
+! PUERTOS ACCESS
+!-----------------------------
+
+interface range fa0/1-10
+switchport mode access
+switchport access vlan 10
+exit
+
+
+interface range fa0/11-20
+switchport mode access
+switchport access vlan 20
+exit
+
+
+!-----------------------------
+! TRONCAL HACIA EL ROUTER
+!-----------------------------
+
+interface g0/1
+switchport mode trunk
+exit
+
+
+!-----------------------------
+! STP
+!-----------------------------
+
+spanning-tree mode pvst
+
+end
+copy run start
+
+
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+!-------------------------------------------- SWITCH DE CAPA 3 -----------------------------------------------------------------------------------------
+
+!-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+!------------------------------------------------
+! SWITCH CAPA 3
+!------------------------------------------------
+
+ena
+conf term
+hostname SW-CAPA3
+
+ip routing
+
+!------------------------------------------------
+! CREACION DE VLANS
+!------------------------------------------------
+
+vlan 10
+name ADMIN
+exit
+
+vlan 20
+name RH
+exit
+
+vlan 30
+name SISTEMAS
+exit
+
+
+!------------------------------------------------
+!  GATEWAY DE LAS VLAN
+!------------------------------------------------
+
+interface vlan 10
+ip address 192.168.10.254 255.255.255.0
+no shutdown
+exit
+
+interface vlan 20
+ip address 192.168.20.254 255.255.255.0
+no shutdown
+exit
+
+interface vlan 30
+ip address 192.168.30.254 255.255.255.0
+no shutdown
+exit
+
+
+!------------------------------------------------
+! PUERTOS ACCESS
+!------------------------------------------------
+
+interface range fa0/1-10
+switchport mode access
+switchport access vlan 10
+exit
+
+interface range fa0/11-20
+switchport mode access
+switchport access vlan 20
+exit
+
+
+!------------------------------------------------
+! ENLACE HACIA ROUTER
+!------------------------------------------------
+
+interface g1/0/1
+no switchport
+ip address 10.1.1.1 255.255.255.252
+no shutdown
+exit
+
+
+!------------------------------------------------
+! DHCP PARA VLANS
+!------------------------------------------------
+
+ip dhcp excluded-address 192.168.10.1 192.168.10.10
+
+ip dhcp pool VLAN10
+network 192.168.10.0 255.255.255.0
+default-router 192.168.10.254
+domain-name empresa.com
+exit
+
+
+!------------------------------------------------
+! RIP
+!------------------------------------------------
+
+router rip
+version 2
+no auto-summary
+network 192.168.10.0
+network 192.168.20.0
+network 192.168.30.0
+network 10.0.0.0
+exit
+
+end
+copy run start
+
+
