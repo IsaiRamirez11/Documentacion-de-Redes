@@ -287,7 +287,7 @@ exit
 
 
 !------------------------------------------------
-!  GATEWAY DE LAS VLAN
+!  GATEWAY DE LAS VLANgit 
 !------------------------------------------------
 
 interface vlan 10
