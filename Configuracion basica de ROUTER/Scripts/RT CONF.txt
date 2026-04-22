@@ -42,6 +42,62 @@ username aux password aux123
 service password-encryption
 crypto key generate rsa
 
+VLAN 30
+name SYSADMIN
+exit
+VLAN 20
+name DESARROLLO
+exit
+VLAN 20
+name OPERACION
+exit
+VLAN 2
+name SERVERS
+exit
+
+
+interface range Fa0/17-22
+switchport Mode Access
+switchport Access Vlan 30
+exit
+
+
+interface range Fa0/10-16
+switchport Mode Access
+switchport Access Vlan 20
+exit
+
+interface range Fa0/1-9
+switchport Mode Access
+switchport Access Vlan 10
+exit
+
+interface range Fa0/0-24
+switchport Mode Access
+switchport Access Vlan 10
+exit
+
+
+
+
+
+interface range Fa0/23-24
+channel-group 1 Mode Active
+exit 
+interface Port-channel 1
+switchport mode Trunk 
+exit
+
+
+!Interface que va al router
+
+
+Interface Gig0/1
+switchport mode trunk
+exit
+
+
+
 line vty 0 15
 login local 
 transport input ssh

@@ -1,3 +1,9 @@
+cORRIJE TODA ESTA PLANTILLA NO USES COMANOS QUE NO VCENGAN A QUI, LAS PC DE LAS VLAN SON IP ESTATICAS POR LO QUE LES DEJARE LA PRIMERA UTILIZABLE DE SU RED LA .1 MANDAME LA CONFIGURACION TAMBIEN DEL SWITCH DE CAPA 3 PARA QUE TODO TENGA CONVERGENCIA TODAS LAS PC TIENEN QU DAR PINGS ENTRE SI, QUIERO QUE ME MANDES TODA LA PLANTILLA no por partes si no todo n un mismo separado por las separaciones que vs en esta de cada cosa, plantilla de cada configuración de cada switch, márcalo como programación del switch de la vlan 50, programación del switch de la vlan 30, programación del switch de la vlan 20, programación del switch de la vlan 40, además de también mandarme la configuración del switch de capa 3, del switch de la red de arriba derecha y la de arriba izquierda de los servidores también la del router a la que esta conectado el sitch de cap 3
+
+
+
+
+
 !    PLANTILLA ISAI RAMIREZ PALMA 
 
 !-------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -142,37 +148,17 @@ ena
 conf term
 hostname RT-IPHELPER
 
-interface g0/0
+interface g0/1
 no shutdown
 exit
 
-
-! VLAN 10
-interface g0/0.10
-encapsulation dot1Q 10
-ip address 192.168.10.254 255.255.255.0
-
-! DHCP al servidor
-ip helper-address 172.16.1.10
+interface g0/2
 no shutdown
 exit
 
-
-! VLAN 20
-interface g0/0.20
-encapsulation dot1Q 20
-ip address 192.168.20.254 255.255.255.0
 
 ! Servidor DHCP 
-ip helper-address 172.16.1.10
-no shutdown
-exit
-
-
-! ENLACES SERIAL
-
-interface s0/0/0
-ip address 10.1.1.2 255.255.255.252
+ip helper-address 172.16.5.10
 no shutdown
 exit
 
@@ -182,8 +168,8 @@ exit
 router rip
 version 2
 no auto-summary
-network 192.168.10.0
-network 192.168.20.0
+network 172.16.5.0
+network 172.16.1.0
 network 10.0.0.0
 exit
 
@@ -273,8 +259,8 @@ ip routing
 ! CREACION DE VLANS
 !------------------------------------------------
 
-vlan 10
-name ADMIN
+vlan 50
+name DESARROLLO
 exit
 
 vlan 20
@@ -282,7 +268,11 @@ name RH
 exit
 
 vlan 30
-name SISTEMAS
+name ADMIN
+exit
+
+vlan 40
+name OPERACION
 exit
 
 
@@ -290,35 +280,26 @@ exit
 !  GATEWAY DE LAS VLANgit 
 !------------------------------------------------
 
-interface vlan 10
-ip address 192.168.10.254 255.255.255.0
+interface vlan 50
+ip address 172.16.50.254 255.255.255.0
 no shutdown
 exit
 
 interface vlan 20
-ip address 192.168.20.254 255.255.255.0
+ip address 172.16.20.254 255.255.255.0
 no shutdown
 exit
 
 interface vlan 30
-ip address 192.168.30.254 255.255.255.0
+ip address 172.16.30.254 255.255.255.0
 no shutdown
 exit
 
-
-!------------------------------------------------
-! PUERTOS ACCESS
-!------------------------------------------------
-
-interface range fa0/1-10
-switchport mode access
-switchport access vlan 10
+interface vlan 40
+ip address 172.16.40.254 255.255.255.0
+no shutdown
 exit
 
-interface range fa0/11-20
-switchport mode access
-switchport access vlan 20
-exit
 
 
 !------------------------------------------------
@@ -332,17 +313,6 @@ no shutdown
 exit
 
 
-!------------------------------------------------
-! DHCP PARA VLANS
-!------------------------------------------------
-
-ip dhcp excluded-address 192.168.10.1 192.168.10.10
-
-ip dhcp pool VLAN10
-network 192.168.10.0 255.255.255.0
-default-router 192.168.10.254
-domain-name empresa.com
-exit
 
 
 !------------------------------------------------
@@ -352,13 +322,101 @@ exit
 router rip
 version 2
 no auto-summary
-network 192.168.10.0
-network 192.168.20.0
-network 192.168.30.0
+network 172.16.50.0
+network 172.16.30.0
+network 172.16.20.0
+network 172.16.40.0
 network 10.0.0.0
 exit
 
 end
 copy run start
+
+
+!-------------------
+
+
+
+
+
+
+
+!/////////SWITCH DE ENLACES REDUNDANTES/////////77
+
+ena
+conf term
+hostname SW-03
+
+VLAN 20
+name RH
+exit
+
+interface range Fa0/13-20
+switchport Mode Access
+switchport Access Vlan 20
+exit
+
+VLAN 40
+name OPERACION
+exit
+
+interface range Fa0/1-12
+switchport Mode Access
+switchport Access Vlan 20
+exit
+
+
+
+
+
+
+interface range Fa0/23-24
+channel-group 1 Mode Active
+
+exit 
+interface Port-channel 1
+switchport mode Trunk 
+exit
+
+
+!////////////otro switch redundante este se hace dos troncales ya que este conecta al router /////////////////
+
+
+
+ena
+conf term
+hostname SW-02
+VLAN 30
+name ADMIN
+exit
+VLAN 20
+name RH
+exit
+VLAN 40
+name OPERACION
+exit
+
+
+interface range Fa0/1-15
+switchport Mode Access
+switchport Access Vlan 30
+exit
+
+
+interface range Fa0/23-24
+channel-group 1 Mode Active
+
+exit 
+interface Port-channel 1
+switchport mode Trunk 
+exit
+
+
+!Interface que va al router
+
+
+Interface Gig0/1
+switchport mode trunk
+exit
 
 
